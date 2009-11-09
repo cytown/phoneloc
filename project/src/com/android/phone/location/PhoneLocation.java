@@ -1,7 +1,7 @@
 package com.android.phone.location;
 
 /**
- * Ê¹ÓÃ·½·¨£º
+ * ä½¿ç”¨æ–¹æ³•ï¼š
  * String s = PhoneLocation.getLocationFromPhone("13501340000");
  * String[] loc = null;
  * if (s != null && !s.equals(" ")) {
