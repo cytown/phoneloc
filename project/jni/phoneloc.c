@@ -100,12 +100,12 @@ getPhoneLocationJni( JNIEnv* env, jclass thiz, jstring phone ) {
 #ifdef DEBUG
     __android_log_print(ANDROID_LOG_DEBUG, TAG, "called [%s]", phone2);
 #endif
-    if (phone2 == NULL) return " ";
+    if (phone2 == NULL) return SPACESTR;
     int len = strlen(phone2);
-    if (len <= 3) return " ";
+    if (len <= 3) return SPACESTR;
     char* nphone = formatPhone(phone2, len);
     len = strlen(nphone);
-    if (len <= 3) return " ";
+    if (len <= 3) return SPACESTR;
 
     char location[48];
     char locationCode[48];
@@ -129,7 +129,7 @@ getPhoneLocationJni( JNIEnv* env, jclass thiz, jstring phone ) {
             memmove(m + 1, m, pos);
             m[7] = 0x00;
         }
-        return " ";
+        return SPACESTR;
     }
     if (nphone[0] == '0') {
         if (nphone[1] == '1' || nphone[1] == '2') {
@@ -137,13 +137,11 @@ getPhoneLocationJni( JNIEnv* env, jclass thiz, jstring phone ) {
         } else if (len > 4) {
             nphone[4] = 0x00;
         } else {
-            return " ";
+            return SPACESTR;
         }
     } else {
         if (len >= 7) {
             nphone[7] = 0x00;
-        } else {
-            //return SPACESTR;
         }
     }
 #ifdef DEBUG
@@ -153,21 +151,6 @@ getPhoneLocationJni( JNIEnv* env, jclass thiz, jstring phone ) {
     if (getLocationInfoEx(num, location, locationCode) >= 0) {
         return (*env)->NewStringUTF(env, locationCode);
     }
-/*
-#ifdef DEBUG
-    jstring sss = getPhoneLocationJni(env, thiz, "+88613501330855");
-        __android_log_print(ANDROID_LOG_DEBUG, TAG, "%s", sss[0]);
-    sss = getPhoneLocationJni(env, thiz, "0085213501330-855");
-        __android_log_print(ANDROID_LOG_DEBUG, TAG, "%s", sss);
-    sss = getPhoneLocationJni(env, thiz, "008613501330-855");
-        __android_log_print(ANDROID_LOG_DEBUG, TAG, "%s", sss);
-    sss = getPhoneLocationJni(env, thiz, "+8613501330855");
-        __android_log_print(ANDROID_LOG_DEBUG, TAG, "%s", sss);
-    sss = getPhoneLocationJni(env, thiz, "125-20-15-01037-0855#888");
-        __android_log_print(ANDROID_LOG_DEBUG, TAG, "%s", sss);
-        __android_log_print(ANDROID_LOG_DEBUG, TAG, "===============");
-#endif
-*/
     return EMPTYSTR;
 }
 
@@ -190,18 +173,19 @@ int getLocationInfoEx(int num, char * location, char * locationCode) {
 }
 
 /*
-JNIEXPORT jstring JNICALL
-getLocationFromJni( JNIEnv* env, jclass thiz, jint num )
-{
-    char location[48];
-    char locationCode[48];
-    memset(locationCode,0x00,48);
-    memset(location,0x00,48);
-
-    if (getLocationInfoEx(num, location, locationCode) < 0) return "";
-
-    return (*env)->NewStringUTF(env, locationCode);
-}
+#ifdef DEBUG
+    jstring sss = getPhoneLocationJni(env, thiz, "+88613501330000");
+        __android_log_print(ANDROID_LOG_DEBUG, TAG, "%s", sss[0]);
+    sss = getPhoneLocationJni(env, thiz, "0085213501330-000");
+        __android_log_print(ANDROID_LOG_DEBUG, TAG, "%s", sss);
+    sss = getPhoneLocationJni(env, thiz, "008613501330-000");
+        __android_log_print(ANDROID_LOG_DEBUG, TAG, "%s", sss);
+    sss = getPhoneLocationJni(env, thiz, "+8613501330000");
+        __android_log_print(ANDROID_LOG_DEBUG, TAG, "%s", sss);
+    sss = getPhoneLocationJni(env, thiz, "125-20-15-01037-0000#888");
+        __android_log_print(ANDROID_LOG_DEBUG, TAG, "%s", sss);
+        __android_log_print(ANDROID_LOG_DEBUG, TAG, "===============");
+#endif
 */
 
 /**
@@ -210,8 +194,6 @@ getLocationFromJni( JNIEnv* env, jclass thiz, jint num )
 static JNINativeMethod gMethods[] = {
     { "getPhoneLocationJni", "(Ljava/lang/String;)Ljava/lang/String;",
             (void*) getPhoneLocationJni },
-//    { "getLocationFromJni", "(I)Ljava/lang/String;",
-//            (void*) getLocationFromJni },
     /* <<----Functions for sync end--------------------------------- */
 };
 
