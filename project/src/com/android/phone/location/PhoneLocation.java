@@ -13,8 +13,6 @@ package com.android.phone.location;
  * }
  */
 
-private static String _phone, _location;
-
 public final class PhoneLocation {
     static {
         System.loadLibrary("phoneloc-jni");
@@ -22,9 +20,11 @@ public final class PhoneLocation {
 
     static native String getPhoneLocationJni(String phone);
 
+    private static String _phone, _location;
+
     public synchronized static String getLocationFromPhone(String num) {
         if (num == null) return null;
-        if (num.equals(_phone) return _location;
+        if (num.equals(_phone)) return _location;
         _phone = num;
         _location = getPhoneLocationJni(num);
         return _location;
