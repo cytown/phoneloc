@@ -17,8 +17,10 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE    := phoneloc-jni
-#LOCAL_SRC_FILES := tools.c cpuusage-jni.c
-LOCAL_SRC_FILES := Global.cpp Mps.cpp phoneloc.c
+#LOCAL_SRC_FILES := Global.cpp Mps.cpp phoneloc.c
+LOCAL_SRC_FILES := Global.cpp Mps.cpp phoneloc.c androidjni.c
+LOCAL_C_INCLUDES += $(JNI_H_INCLUDE)
+LOCAL_PRELINK_MODULE := false
 LOCAL_LDLIBS := -L${SYSROOT}/usr/lib -llog
 #LOCAL_SHARED_LIBRARIES := libcutils libutils
 

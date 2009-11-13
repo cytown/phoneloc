@@ -3,25 +3,26 @@
  *
  * Base on code from Geesun
  * Modified by cytown
- * Last edited 2009.11.06
+ * Last edited 2009.11.13
  */
 #include <string.h>
 #include <stdio.h>
 #include <jni.h>
 #include <assert.h>
+#include <android/log.h>
 
 //#define DEBUG
 
-#ifdef DEBUG
-#include <android/log.h>
-const static char* TAG = "phonelocjni";
-#endif
+//#ifdef DEBUG
+#define TAG "phonelocjni"
+//#endif
 
-const static char* LOC_FILE = "/data/phoneloc.dat";
+const static char* LOC_FILE = "/data/system/phoneloc.dat";
 const static char* KNOWN_PREFIX[] = {"0086", "106", "12520", "17951", "17909", "12593"};
 const static int KNOWN_PREFIX_LEN = 6;
-const static jstring SPACESTR = " ";
-const static jstring EMPTYSTR = "";
+const static char* KNOWN_PHONE[] = {"13800138000"};
+const static char* KNOWN_PHONE_CN[] = {"001,中移动客服"};
+const static int KNOWN_PHONE_LEN = 1;
 
 static int exists = 0;
 
@@ -36,9 +37,7 @@ int file_exists(const char * filename) {
         exists = 1;
         return 0;
     }
-#ifdef DEBUG
-     __android_log_print(ANDROID_LOG_ERROR, TAG, "DATA FILE (%s) NOT EXIST!", LOC_FILE);
-#endif
+    __android_log_print(ANDROID_LOG_ERROR, TAG, "DATA FILE (%s) NOT EXIST!", LOC_FILE);
     exists = -1;
     return exists;
 }
@@ -50,9 +49,10 @@ int isInterPhone(char * phone, int len) {
     return -1;
 }
 
-char* formatPhone(char* phone, int len) {
-    char nphone[48];
-    memset(nphone, 0x00, 48);
+void formatPhone(char* phone, int len, char* nphone) {
+    if (phone == NULL || nphone == NULL) {
+        return;
+    }
     // shouldn't length over 40!
     if (len > 40) len = 40;
     strncpy(nphone, phone, len);
@@ -88,8 +88,6 @@ char* formatPhone(char* phone, int len) {
 #ifdef DEBUG
      __android_log_print(ANDROID_LOG_DEBUG, TAG, "after format: %s", nphone);
 #endif
-    char* ret = nphone;
-    return ret;
 }
 
 JNIEXPORT jstring JNICALL
@@ -100,12 +98,15 @@ getPhoneLocationJni( JNIEnv* env, jclass thiz, jstring phone ) {
 #ifdef DEBUG
     __android_log_print(ANDROID_LOG_DEBUG, TAG, "called [%s]", phone2);
 #endif
-    if (phone2 == NULL) return SPACESTR;
+    if (phone2 == NULL) return NULL;
     int len = strlen(phone2);
-    if (len <= 3) return SPACESTR;
-    char* nphone = formatPhone(phone2, len);
+    if (len < 3) return NULL;
+
+    char nphone[48];
+    memset(nphone, 0x00, sizeof(nphone));
+    formatPhone(phone2, len, nphone);
     len = strlen(nphone);
-    if (len <= 3) return SPACESTR;
+    if (len < 3) return NULL;
 
     char location[48];
     char locationCode[48];
@@ -113,6 +114,9 @@ getPhoneLocationJni( JNIEnv* env, jclass thiz, jstring phone ) {
     memset(location,0x00,48);
 
     if (isInterPhone(nphone, len) >= 0) {
+#ifdef DEBUG
+    __android_log_print(ANDROID_LOG_DEBUG, TAG, "inter phone[%s]", nphone);
+#endif
         int pos = len > 6 ? 6 : len;
         char m[8];
         memset(m, 0x00, 8);
@@ -126,10 +130,10 @@ getPhoneLocationJni( JNIEnv* env, jclass thiz, jstring phone ) {
             if (getLocationInfoEx(num, location, locationCode) >= 0) {
                 return (*env)->NewStringUTF(env, locationCode);
             }
-            memmove(m + 1, m, pos);
+            memmove(m + 1, m, 6);
             m[7] = 0x00;
         }
-        return SPACESTR;
+        return NULL;
     }
     if (nphone[0] == '0') {
         if (nphone[1] == '1' || nphone[1] == '2') {
@@ -137,9 +141,16 @@ getPhoneLocationJni( JNIEnv* env, jclass thiz, jstring phone ) {
         } else if (len > 4) {
             nphone[4] = 0x00;
         } else {
-            return SPACESTR;
+            return NULL;
         }
     } else {
+        int i;
+        for (i = 0; i < KNOWN_PHONE_LEN; i++) {
+            int l = strlen(KNOWN_PHONE[i]);
+            if (strncmp(nphone, KNOWN_PHONE[i], l) == 0) {
+                return (*env)->NewStringUTF(env, KNOWN_PHONE_CN[i]);
+            }
+        }
         if (len >= 7) {
             nphone[7] = 0x00;
         }
@@ -151,7 +162,10 @@ getPhoneLocationJni( JNIEnv* env, jclass thiz, jstring phone ) {
     if (getLocationInfoEx(num, location, locationCode) >= 0) {
         return (*env)->NewStringUTF(env, locationCode);
     }
-    return EMPTYSTR;
+#ifdef DEBUG
+    __android_log_print(ANDROID_LOG_DEBUG, TAG, "return emptystr");
+#endif
+    return NULL;
 }
 
 int getLocationInfoEx(int num, char * location, char * locationCode) {
@@ -163,6 +177,9 @@ int getLocationInfoEx(int num, char * location, char * locationCode) {
     }
 
     getLocationInfo(LOC_FILE, num, location, locationCode);
+#ifdef DEBUG
+        __android_log_print(ANDROID_LOG_DEBUG, TAG, "return is %d, %s, %d, %s", strlen(location), location, strlen(locationCode), locationCode);
+#endif
     if (location[0] == ' ' && location[1] == 0x00) return -1;
     strcat(locationCode, ",");
     strcat(locationCode, location);
@@ -187,82 +204,4 @@ int getLocationInfoEx(int num, char * location, char * locationCode) {
         __android_log_print(ANDROID_LOG_DEBUG, TAG, "===============");
 #endif
 */
-
-/**
- * Table of methods associated with a single class.
- */
-static JNINativeMethod gMethods[] = {
-    { "getPhoneLocationJni", "(Ljava/lang/String;)Ljava/lang/String;",
-            (void*) getPhoneLocationJni },
-    /* <<----Functions for sync end--------------------------------- */
-};
-
-
-/*
- * Register several native methods for one class.
- */
-static int registerNativeMethods(JNIEnv* env, const char* className,
-    JNINativeMethod* gMethods, int numMethods)
-{
-    jclass clazz;
-
-    clazz = (*env)->FindClass(env, className);
-    if (clazz == NULL) {
-#ifdef DEBUG
-        __android_log_print(ANDROID_LOG_DEBUG, TAG, "class not exist!");
-#endif
-        return JNI_FALSE;
-    }
-    if ((*env)->RegisterNatives(env, clazz, gMethods, numMethods) < 0) {
-#ifdef DEBUG
-        __android_log_print(ANDROID_LOG_DEBUG, TAG, "method not exist!");
-#endif
-        return JNI_FALSE;
-    }
-
-    return JNI_TRUE;
-}
-
-
-/*
- * Register native methods for all classes we know about.
- */
-static int registerNatives(JNIEnv* env)
-{
-    if (!registerNativeMethods(env,
-           "com/android/phone/location/PhoneLocation",
-            gMethods, sizeof(gMethods) / sizeof(gMethods[0])))
-        return JNI_FALSE;
-
-    return JNI_TRUE;
-}
-
-/*
- * Set some test stuff up.
- *
- * Returns the JNI version on success, -1 on failure.
- */
-JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
-{
-    JNIEnv* env = NULL;
-    jint result = -1;
-
-#ifdef DEBUG
-    __android_log_print(ANDROID_LOG_DEBUG, TAG, "onload");
-#endif
-
-    if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_4) != JNI_OK) {
-        return -1;
-    }
-    assert(env != NULL);
-    
-    if (!registerNatives(env)) {
-        return -1;
-    }
-    /* success -- return valid version number */
-    result = JNI_VERSION_1_4;
- 
-    return result;
-}
-
 
