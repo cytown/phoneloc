@@ -16,7 +16,7 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE    := phoneloc-jni
+LOCAL_MODULE    := libphoneloc-jni
 #LOCAL_SRC_FILES := Global.cpp Mps.cpp phoneloc.c
 LOCAL_SRC_FILES := Global.cpp Mps.cpp phoneloc.c androidjni.c
 LOCAL_C_INCLUDES += $(JNI_H_INCLUDE)

@@ -7,6 +7,7 @@
  */
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <jni.h>
 #include <assert.h>
 #include <android/log.h>
@@ -17,13 +18,22 @@
 #define TAG "phonelocjni"
 //#endif
 
-const static char* LOC_FILE = "/data/system/phoneloc.dat";
-const static char* KNOWN_PREFIX[] = {"0086", "106", "12520", "17951", "17909", "12593"};
-const static int KNOWN_PREFIX_LEN = 6;
-const static char* KNOWN_PHONE[] = {"13800138000"};
-const static char* KNOWN_PHONE_CN[] = {"001,中移动客服"};
-const static int KNOWN_PHONE_LEN = 1;
+#define MAX_PHONE_LEN   48
+#define MAX_PHONE_CN_LEN  100
 
+typedef struct known_phone_info{
+    char known_phone[MAX_PHONE_LEN];
+    char known_phone_cn[MAX_PHONE_LEN];
+} known_phone_info_t;
+
+static known_phone_info_t g_known_phone[] = {
+    {"13800138000","001,中国移动客服"},
+    {"1008611","001,中国移动客服"},
+};
+
+static const  int KNOWN_PREFIX_LEN = 6;
+static const char LOC_FILE[] = "/data/system/phoneloc.dat";
+static const char* KNOWN_PREFIX[] = {"0086", "106", "12520", "17951", "17909", "12593"};
 static int exists = 0;
 
 int file_exists(const char * filename) {
@@ -147,10 +157,10 @@ getPhoneLocationJni( JNIEnv* env, jclass thiz, jstring phone ) {
         }
     } else {
         int i;
-        for (i = 0; i < KNOWN_PHONE_LEN; i++) {
-            int l = strlen(KNOWN_PHONE[i]);
-            if (strncmp(nphone, KNOWN_PHONE[i], l) == 0) {
-                return (*env)->NewStringUTF(env, KNOWN_PHONE_CN[i]);
+        for (i = 0; i <sizeof(g_known_phone) /sizeof(known_phone_info_t); i++) {
+            int l = strlen(g_known_phone[i].known_phone);
+            if (strncmp(nphone, g_known_phone[i].known_phone, l) == 0) {
+                return (*env)->NewStringUTF(env, g_known_phone[i].known_phone_cn);
             }
         }
         if (len >= 7) {
