@@ -4,6 +4,9 @@
   Email : rssn@163.com
   QQ    : 126027268
   Blog  : http://blog.csdn.net/rssn_net/
+   Modify History:
+   1) Geesun 2009/10/09 增加城市区号
+   2) Geesun 2009/10/11 更改号码为24位,以节约空间200k
  ************************************************************/
 
 #ifndef _MPGLOBAL_INCLUDED_
@@ -55,11 +58,5 @@ typedef struct _MpLocation
 	char Location[48];
     int locationCode;
 } MpLocation;
-
-//更改文件扩展名
-extern char * ChangeFileExt(const char * fn, const char * fext);
-
-//判断字符串是否为数字
-extern bool IsNumeric(const char * val);
 
 #endif

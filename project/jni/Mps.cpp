@@ -1,10 +1,9 @@
 /************************************************************
-  手机号归属地数据导入及查询工具源代码（C++）
+  原作者信息:
   Author: rssn
   Email : rssn@163.com
   QQ    : 126027268
   Blog  : http://blog.csdn.net/rssn_net/
-  Down  : http://www.codefans.net
   Modify History:
     1) Geesun 2009/10/09 修正二分法查找可能找不到记录问题   
     2) Geesun 2009/10/11 更改号码为24位，以节约空间200k。

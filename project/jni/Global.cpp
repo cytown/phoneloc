@@ -1,9 +1,11 @@
 /************************************************************
-手机号归属地数据导入及查询工具源代码（C++）
+  原作者信息:
   Author: rssn
   Email : rssn@163.com
   QQ    : 126027268
   Blog  : http://blog.csdn.net/rssn_net/
+  Modify History:
+   1) Geesun 2009/10/09 增加城市区号
  ************************************************************/
 
 #include <stdio.h>
@@ -41,13 +43,3 @@ IndexNode::IndexNode(int ns, int ne, StringNode * ad)
 	next=NULL;
 }
 
-
-bool IsNumeric(const char * val)
-{
-	for(int i=0;val[i]!='\0';i++)
-	{
-		if(val[i]<'0'||val[i]>'9')
-			return false;
-	}
-	return true;
-}
