@@ -1,8 +1,12 @@
+#ifndef __ANDROID_JNI_H__
+#define __ANDROID_JNI_H__
+
 /*
  * Global header for android jni call
  *
  * Created by cytown
  * Last edited 2009.11.13
+ * 
  */
 
 /**
@@ -21,4 +25,4 @@ static JNINativeMethod gMethods[] = {
             (void*) getPhoneLocationJni },
     /* <<----Functions for sync end--------------------------------- */
 };
-
+#endif

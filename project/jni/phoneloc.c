@@ -37,7 +37,9 @@ int file_exists(const char * filename) {
         exists = 1;
         return 0;
     }
+#ifdef DEBUG
     __android_log_print(ANDROID_LOG_ERROR, TAG, "DATA FILE (%s) NOT EXIST!", LOC_FILE);
+#endif
     exists = -1;
     return exists;
 }
