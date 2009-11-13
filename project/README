@@ -1,5 +1,5 @@
 Usage:
-copy assets/phoneloc.dat as /data/phoneloc.dat
+copy assets/phoneloc.dat as /data/system/phoneloc.dat
 copy libphoneloc-jni.so as /system/lib/libphoneloc-jni.so
 
 Then copy src file to any project you want to use this lib.
