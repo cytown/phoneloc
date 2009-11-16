@@ -31,7 +31,7 @@ static known_phone_info_t g_known_phone[] = {
     {"1008611","001,中国移动客服"},
 };
 
-static const  int KNOWN_PREFIX_LEN = 6;
+static const int KNOWN_PREFIX_LEN = 6;
 static const char LOC_FILE[] = "/data/system/phoneloc.dat";
 static const char* KNOWN_PREFIX[] = {"0086", "106", "12520", "17951", "17909", "12593"};
 static int exists = 0;
@@ -155,7 +155,8 @@ getPhoneLocationJni( JNIEnv* env, jclass thiz, jstring phone ) {
         }
     } else {
         int i;
-        for (i = 0; i <sizeof(g_known_phone) /sizeof(known_phone_info_t); i++) {
+        int count = sizeof(g_known_phone) / sizeof(known_phone_info_t);
+        for (i = 0; i < count; i++) {
             int l = strlen(g_known_phone[i].known_phone);
             if (strncmp(nphone, g_known_phone[i].known_phone, l) == 0) {
                 return (*env)->NewStringUTF(env, g_known_phone[i].known_phone_cn);
