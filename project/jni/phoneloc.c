@@ -18,8 +18,8 @@
 #define TAG "phonelocjni"
 //#endif
 
-#define MAX_PHONE_LEN   48
-#define MAX_PHONE_CN_LEN  100
+#define MAX_PHONE_LEN 20
+#define MAX_PHONE_CN_LEN 40
 
 typedef struct known_phone_info{
     char known_phone[MAX_PHONE_LEN];
