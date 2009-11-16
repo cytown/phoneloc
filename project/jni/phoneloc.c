@@ -23,7 +23,7 @@
 
 typedef struct known_phone_info{
     char known_phone[MAX_PHONE_LEN];
-    char known_phone_cn[MAX_PHONE_LEN];
+    char known_phone_cn[MAX_PHONE_CN_LEN];
 } known_phone_info_t;
 
 static known_phone_info_t g_known_phone[] = {
