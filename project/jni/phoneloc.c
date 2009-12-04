@@ -32,7 +32,7 @@ static known_phone_info_t g_known_phone[] = {
 };
 
 static const int KNOWN_PREFIX_LEN = 6;
-static const char LOC_FILE[] = "/data/system/phoneloc.dat";
+static const char LOC_FILE[] = "/system/usr/share/phoneloc.dat";
 static const char* KNOWN_PREFIX[] = {"0086", "106", "12520", "17951", "17909", "12593"};
 static int exists = 0;
 
@@ -148,7 +148,7 @@ getPhoneLocationJni( JNIEnv* env, jclass thiz, jstring phone ) {
     if (nphone[0] == '0') {
         if (nphone[1] == '1' || nphone[1] == '2') {
             nphone[3] = 0x00;
-        } else if (len > 4) {
+        } else if (len >= 4) {
             nphone[4] = 0x00;
         } else {
             return NULL;
