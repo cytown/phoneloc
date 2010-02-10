@@ -29,8 +29,8 @@ typedef struct known_phone_info{
 static known_phone_info_t g_known_phone[] = {
     {"13800138000","001,中国移动客服"},
     {"1008611","001,中国移动客服"},
+    {"10658","001,移动信息台"},
 };
-//    {"10658","001,移动信息台"},
 
 static const int KNOWN_PREFIX_LEN = 12;
 static const char LOC_FILE[] = "/system/usr/share/phoneloc.dat";
@@ -124,11 +124,18 @@ getPhoneLocationJni( JNIEnv* env, jclass thiz, jstring phone ) {
 #ifdef DEBUG
      __android_log_print(ANDROID_LOG_DEBUG, TAG, "parse: %s %d", phone2, len);
 #endif
-    if (strncmp(phone2, "10658", 5) == 0) {  // test whether start with 12520 and other is not a mobile no.
-        return (*env)->NewStringUTF(env, "001,移动信息台");
-    }
     if (strncmp(phone2, "12520", 5) == 0 && len < 11) {  // test whether start with 12520 and other is not a mobile no.
         return (*env)->NewStringUTF(env, "001,移动飞信用户");
+    }
+    {  // parse the known phones
+        int i;
+        int count = sizeof(g_known_phone) / sizeof(known_phone_info_t);
+        for (i = 0; i < count; i++) {
+            int l = strlen(g_known_phone[i].known_phone);
+            if (strncmp(phone2, g_known_phone[i].known_phone, l) == 0) {
+                return (*env)->NewStringUTF(env, g_known_phone[i].known_phone_cn);
+            }
+        }
     }
     char location[48];
     char locationCode[48];
@@ -166,14 +173,6 @@ getPhoneLocationJni( JNIEnv* env, jclass thiz, jstring phone ) {
             return NULL;
         }
     } else {
-        int i;
-        int count = sizeof(g_known_phone) / sizeof(known_phone_info_t);
-        for (i = 0; i < count; i++) {
-            int l = strlen(g_known_phone[i].known_phone);
-            if (strncmp(nphone, g_known_phone[i].known_phone, l) == 0) {
-                return (*env)->NewStringUTF(env, g_known_phone[i].known_phone_cn);
-            }
-        }
         if (len >= 7) {
             nphone[7] = 0x00;
         }
