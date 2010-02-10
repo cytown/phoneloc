@@ -3,7 +3,7 @@
  *
  * Base on code from Geesun
  * Modified by cytown
- * Last edited 2009.11.13
+ * Last edited 2010.02.09
  */
 #include <string.h>
 #include <stdio.h>
@@ -30,10 +30,12 @@ static known_phone_info_t g_known_phone[] = {
     {"13800138000","001,中国移动客服"},
     {"1008611","001,中国移动客服"},
 };
+//    {"10658","001,移动信息台"},
 
-static const int KNOWN_PREFIX_LEN = 6;
+static const int KNOWN_PREFIX_LEN = 12;
 static const char LOC_FILE[] = "/system/usr/share/phoneloc.dat";
-static const char* KNOWN_PREFIX[] = {"0086", "106", "12520", "17951", "17909", "12593"};
+static const char* KNOWN_PREFIX[] = {"0086", "106", "12520", "17951", "17909", "12593", "17950", "17910", "17911", 
+    "193", "17900", "17901"};
 static int exists = 0;
 
 int file_exists(const char * filename) {
@@ -81,6 +83,7 @@ void formatPhone(char* phone, int len, char* nphone) {
             memmove(nphone, nphone + 1, len);
         }
     }
+    strncpy(phone, nphone, len);
     int i;
     for (i = 0; i < KNOWN_PREFIX_LEN; i++) {
         int l = strlen(KNOWN_PREFIX[i]);
@@ -118,6 +121,15 @@ getPhoneLocationJni( JNIEnv* env, jclass thiz, jstring phone ) {
     len = strlen(nphone);
     if (len < 3) return NULL;
 
+#ifdef DEBUG
+     __android_log_print(ANDROID_LOG_DEBUG, TAG, "parse: %s %d", phone2, len);
+#endif
+    if (strncmp(phone2, "10658", 5) == 0) {  // test whether start with 12520 and other is not a mobile no.
+        return (*env)->NewStringUTF(env, "001,移动信息台");
+    }
+    if (strncmp(phone2, "12520", 5) == 0 && len < 11) {  // test whether start with 12520 and other is not a mobile no.
+        return (*env)->NewStringUTF(env, "001,移动飞信用户");
+    }
     char location[48];
     char locationCode[48];
     memset(locationCode,0x00,48);
