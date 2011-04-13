@@ -54,13 +54,13 @@ inline StringNode * FindString(StringNode * st, const char * str)
 }
 
 //文本数据 -> 二进制数据文件
-void MpDataConvert(const char * fnin, const char * fnout)
+int MpDataConvert(const char * fnin, const char * fnout)
 {
 	FILE * fpin=fopen(fnin,"rb");     //输入文件
 	if(!fpin)
 	{
 		printf("打开文件失败!\n");
-		return;
+		return 1;
 	}
 
 	printf("正在导入文件 [%s] 到 [%s] ... ",fnin,fnout);
@@ -197,6 +197,7 @@ void MpDataConvert(const char * fnin, const char * fnout)
 	printf("字符串记录数: %d\n",k);
 	printf("目标文件大小: %d字节\n",pos);
 	/***********************************************/
+    return 0;
 
 }
 
@@ -214,7 +215,7 @@ inline void printHelp()
 //===================主程序入口===================
 int main(int argc, char * argv[])
 {
-
+    int ret = 0;
 	if(argc>1)
 	{
 		char opcode='h'; 
@@ -232,11 +233,12 @@ int main(int argc, char * argv[])
 		{
 		case 'c':
 			//导入数据
-			MpDataConvert(val,ChangeFileExt(val,"dat"));
+			ret = MpDataConvert(val,ChangeFileExt(val,"dat"));
 			break;
 		case 'h':
 			//帮助信息
 			printHelp();
+            ret = 1;
 			break;
 		default:
 			//无操作
@@ -244,6 +246,6 @@ int main(int argc, char * argv[])
 		}
 	}
 
-    return 0;
+    return ret;
 }
 
